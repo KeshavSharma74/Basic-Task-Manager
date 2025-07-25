@@ -1,21 +1,24 @@
 import express from "express";
-import "dotenv/config"
+import "dotenv/config";
 import connectDb from "./config/database.js";
 import router from "./routes/todo.route.js";
-const app=express()
+import cors from "cors"; // Correct import
 
+const app = express();
+
+app.use(cors()); // ✅ Allows all origins
 app.use(express.json());
 
 connectDb();
-const port=process.env.PORT||5000
 
-app.get('/',(req,res)=>{
-    res.send("App is live")
-})
+const port = process.env.PORT || 5000;
 
-app.use('/api/v1/',router);
+app.get('/', (req, res) => {
+    res.send("App is live");
+});
 
-app.listen(port,()=>{
-    console.log("App is listening at port : ",port)
-})
+app.use('/api/v1/', router);
 
+app.listen(port, () => {
+    console.log("App is listening at port:", port);
+});
