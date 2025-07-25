@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-// Modern icons from Heroicons
 import {
   PencilSquareIcon,
   TrashIcon,
@@ -17,17 +16,17 @@ const App = () => {
   const [allTodo, setAllTodo] = useState([]);
   const [editingTodo, setEditingTodo] = useState(null);
   const [editingText, setEditingText] = useState('');
-  // State for dark mode
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // --- Core Todo Logic (Unchanged) ---
+  const BASE_URL = 'https://basic-task-manager-sandy.vercel.app/api/v1';
+
   const handleOnClick = async () => {
     if (!newTodo.trim()) {
       toast.info('Todo cannot be empty');
       return;
     }
     try {
-      const { data } = await axios.post('http://localhost:4000/api/v1/', { text: newTodo });
+      const { data } = await axios.post(`${BASE_URL}/`, { text: newTodo });
       setAllTodo([data.data, ...allTodo]);
       setNewTodo('');
       toast.success('Todo Added Successfully');
@@ -39,7 +38,7 @@ const App = () => {
 
   const fetchAllTodo = async () => {
     try {
-      const { data } = await axios.get('http://localhost:4000/api/v1');
+      const { data } = await axios.get(BASE_URL);
       setAllTodo(data.data.reverse());
     } catch (error) {
       console.log('Error while fetching the todos:', error);
@@ -53,7 +52,7 @@ const App = () => {
 
   const handleUpdate = async () => {
     try {
-      const response = await axios.patch(`http://localhost:4000/api/v1/${editingTodo}`, { text: editingText });
+      const response = await axios.patch(`${BASE_URL}/${editingTodo}`, { text: editingText });
       if (response.data.success) {
         toast.success('Todo Updated Successfully');
         setAllTodo((prevTodos) =>
@@ -74,7 +73,7 @@ const App = () => {
 
   const handleDelete = async (id) => {
     try {
-      const response = await axios.delete(`http://localhost:4000/api/v1/${id}`);
+      const response = await axios.delete(`${BASE_URL}/${id}`);
       if (response.data.success) {
         toast.success('Todo Deleted successfully');
         const newTodoList = allTodo.filter((todo) => todo._id !== id);
@@ -91,7 +90,7 @@ const App = () => {
   const handleComplete = async (todo) => {
     try {
       const updatedStatus = !todo.completed;
-      const response = await axios.patch(`http://localhost:4000/api/v1/${todo._id}`, {
+      const response = await axios.patch(`${BASE_URL}/${todo._id}`, {
         completed: updatedStatus,
       });
 
@@ -115,7 +114,6 @@ const App = () => {
     fetchAllTodo();
   }, []);
 
-  // --- JSX with manual dark mode ---
   return (
     <div className={`min-h-screen w-full flex justify-center items-start sm:items-center p-4 font-sans transition-colors duration-500 ${isDarkMode ? 'bg-slate-900 text-slate-200' : 'bg-slate-100 text-slate-800'}`}>
       <div className={`w-full max-w-lg rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-lg transition-all ${isDarkMode ? 'bg-slate-800/60 shadow-black/30 border-slate-700/50' : 'bg-white/70 shadow-slate-400/20 border-slate-200/50'} border`}>
